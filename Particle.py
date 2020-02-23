@@ -16,15 +16,15 @@ class Particle:
     #G=6.67408E-11
     G=scipy.constants.G
 
-    def __init__(self, Position=np.array([0,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), Acceleration=np.array([0,-10,0], dtype=float), Name='Ball', Mass=1.0):
-        self.Name = Name
+    def __init__(self, Position=np.array([0,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), Acceleration=np.array([0,-10,0], dtype=float), name='Ball', mass=1.0):
+        self.name = name
         self.position = np.array(Position,dtype=float)
         self.velocity = np.array(Velocity,dtype=float)
         self.acceleration = np.array(Acceleration,dtype=float)
-        self.mass = Mass
+        self.mass = mass
 
     def __repr__(self):
-        return 'Particle: {0}, Mass: {1:12.3e}, Position: {2}, Velocity: {3}, Acceleration: {4}'.format(self.Name,self.mass,self.position, self.velocity,self.acceleration)
+        return 'Particle: {0}, Mass: {1:12.3e}, Position: {2}, Velocity: {3}, Acceleration: {4}'.format(self.name,self.mass,self.position, self.velocity,self.acceleration)
 
     def KineticEnergy(self):
         return 0.5*self.mass*np.vdot(self.velocity,self.velocity)

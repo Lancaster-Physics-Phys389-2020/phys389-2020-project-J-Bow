@@ -3,18 +3,24 @@ import numpy as np
 from Particle import Particle
 from Tether import Tether
 import scipy.constants
-import matplotlib
+import matplotlib.pyplot as plt
 import pandas as pd 
-
+from pandas import DataFrame
 deltaT = 0.01
 T = 0
-endT = 20
+endT = 1
+Data = []
+T_array = []
 
+head = Tether(np.array([0,4,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
 
-head = Tether(np.array([1,0,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
-print("theta after inheritance",head.theta)
 while T <= endT:
     T += deltaT
-    head.update(deltaT)
+    head.update_angular(deltaT)
+    Data.append([head.name, head.mass, head.position, head.velocity, head.acceleration, head.theta, head.omega, head.alpha, T])
+    
+    
 
-    print(head)
+df = pd.DataFrame(data = Data, columns= ['name', 'mass', 'position', 'velocity', 'acceleration', 'theta', 'omega', 'alpha', 'time'])
+df.to_pickle("output_data.csv")
+
