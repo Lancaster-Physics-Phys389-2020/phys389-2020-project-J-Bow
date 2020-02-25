@@ -6,13 +6,13 @@ import scipy.constants
 import matplotlib.pyplot as plt
 import pandas as pd 
 from pandas import DataFrame
-deltaT = 0.01
+deltaT = 0.001
 T = 0
-endT = 1
+endT = 10
 Data = []
 T_array = []
 
-head = Tether(np.array([0,4,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
+head = Tether(np.array([4,0,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
 
 while T <= endT:
     T += deltaT
