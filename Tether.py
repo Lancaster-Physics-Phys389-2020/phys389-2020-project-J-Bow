@@ -26,7 +26,7 @@ class Tether(Particle):
 
 
     def update_angular(self, deltaT):
-        self.alpha = -(9.81/self.length) * math.sin(self.theta)
+        self.alpha = -(9.81/self.length) * np.sin(self.theta)
     
         self.omega += self.alpha * deltaT
         
@@ -36,13 +36,11 @@ class Tether(Particle):
             self.theta =self.theta - 2*scipy.constants.pi
             self.theta += self.omega * deltaT 
 
-"""
-        self.position[0] = (self.length**2 - math.sin(self.theta)**2)**0.5
+        self.position[0] = self.length * np.cos(self.theta - scipy.constants.pi/2)
         
-        self.position[1] = (self.length**2 - math.cos(self.theta)**2)**0.5
-"""
+        self.position[1] = self.length * np.sin(self.theta - scipy.constants.pi/2)
 
-        #print("Position=", self.position)
-        #print("Theta=", self.theta)
-        #self.acceleration = np.cross(np.array([0,0,self.alpha]), (self.length * (self.position/(np.linalg.norm(self.position))))) + np.cross(np.array([0,0,self.omega]), np.cross(np.array([0,0,self.omega]), (self.length * (self.position/(np.linalg.norm(self.position))))))
-    
+        self.acceleration = np.cross(np.array([0,0,self.alpha]), (self.length * (self.position/(np.linalg.norm(self.position))))) + np.cross(np.array([0,0,self.omega]), np.cross(np.array([0,0,self.omega]), (self.length * (self.position/(np.linalg.norm(self.position))))))
+
+        self.velocity +=  self.acceleration*deltaT
+
