@@ -10,9 +10,9 @@ class Tether(Particle):
   
     def __init__(self, Position=np.array([0,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), Acceleration=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float)):
         super().__init__(Position=Position, Velocity=Velocity, Acceleration=Acceleration, name=name, mass=mass)
-        self.theta = np.arctan(self.position[1]/self.position[0]) 
-        self.length = np.linalg.norm(self.position)
-        self.omega = (np.cross(self.position, self.velocity)/(self.length**2))
+        self.theta = self.set_theta()
+        self.length = self.set_length()
+        self.omega = self.set_omega()
         self.alpha = alpha
 
 
@@ -20,7 +20,26 @@ class Tether(Particle):
         return '{0}, {1}, {2}, {3},  {4}, {5},  {6}, {7}, {8}'.format(self.name,self.mass,self.position, self.velocity,self.acceleration,self.theta,self.length, self.omega, self.alpha)
 
     g=9.81
+    
+    def set_theta(self):
+        if self.position[0] ==0:
+            if self.position[1] < 0:
+                return 0
+            else:
+                return scipy.constants.pi 
+        if self.position[1] == 0:
+            if self.position[0] < 0:
+                return 3*scipy.constants.pi/2
+            else:
+                return scipy.constants.pi/2
+        else:
+            return np.arctan(self.position[1]/self.position[0]) - scipy.constants.pi/2 
 
+    def set_length(self):
+        return np.linalg.norm(self.position)
+
+    def set_omega(self):
+        return (np.cross(self.position, self.velocity)/(self.length**2))
 
     def update_angular(self, deltaT, method):
 
@@ -52,7 +71,7 @@ class Tether(Particle):
             w_mid = self.omega + self.acceleration*deltaT/2.
 
             update_alpha(self, deltaT)
-            self.omega += a_mid * deltaT
+            #self.omega += a_mid * deltaT
             self.theta += w_mid * deltaT   
 
     def update_linear(self, deltaT):

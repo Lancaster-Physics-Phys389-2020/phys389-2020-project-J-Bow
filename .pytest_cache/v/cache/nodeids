@@ -1,6 +1,6 @@
 [
-  "test_Tether.py::test_update_alpha[Tether(np.array([0,0,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )-0.1-0.1]",
-  "Polynomial/test_Polynomial.py::test_create",
-  "Polynomial/test_Polynomial.py::test_poynoial_add",
-  "Polynomial/test_Polynomial.py::test_broken_test"
+  "test_Tether.py::test_set_theta[test_input0-3.141592653589793]",
+  "test_Tether.py::test_set_theta[test_input1-1.5707963267948966]",
+  "test_Tether.py::test_set_theta[test_input2-4.71238898038469]",
+  "test_Tether.py::test_set_theta[test_input3-0]"
 ]
