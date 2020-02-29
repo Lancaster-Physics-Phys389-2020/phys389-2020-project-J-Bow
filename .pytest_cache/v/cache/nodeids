@@ -1,0 +1,6 @@
+[
+  "test_Tether.py::test_update_alpha[Tether(np.array([0,0,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )-0.1-0.1]",
+  "Polynomial/test_Polynomial.py::test_create",
+  "Polynomial/test_Polynomial.py::test_poynoial_add",
+  "Polynomial/test_Polynomial.py::test_broken_test"
+]
