@@ -45,17 +45,18 @@ class Tether(Particle):
 
         def update_alpha(self, deltaT):
             self.alpha = np.array([0,0,-(9.81/self.length) * np.sin(self.theta)])
-            return self.alpha
 
         def update_omega(self, deltaT):
             self.omega += self.alpha * deltaT
 
         def update_theta(self, deltaT):
-#            if self.theta <= 2*scipy.constants.pi:
             self.theta += self.omega[2] * deltaT
-#            else:
- #               self.theta =self.theta - 2*scipy.constants.pi
-  #              self.theta += self.omega[2] * deltaT 
+
+        def update_richardson(self, deltaT):
+            alpha_mid = np.array([0,0,(-(9.81/self.length)*np.sin(self.theta + (self.omega[2]*deltaT/2)))])
+            self.omega += alpha_mid*deltaT
+            self.theta += (self.omega[2] +0.5*self.alpha[2]*deltaT)*deltaT
+            self.alpha = alpha_mid
 
         if method == "Euler":
             update_alpha(self, deltaT)
@@ -68,21 +69,18 @@ class Tether(Particle):
             update_theta(self, deltaT)
 
         elif method == "Euler-Richardson":
-            w_mid = self.omega + self.acceleration*deltaT/2.
-
             update_alpha(self, deltaT)
-            #self.omega += a_mid * deltaT
-            self.theta += w_mid * deltaT   
+            update_richardson(self, deltaT) 
 
     def update_linear(self, deltaT):
-#        self.position[0] = self.length * np.cos(self.theta - scipy.constants.pi/2)
-#        self.position[1] = self.length * np.sin(self.theta - scipy.constants.pi/2)
+        self.position[0] = self.length * np.cos(self.theta - scipy.constants.pi/2)
+        self.position[1] = self.length * np.sin(self.theta - scipy.constants.pi/2)
         #A = a x r + w x r
-        self.acceleration = np.cross((self.alpha), (self.length * (self.position/(np.linalg.norm(self.position))))) + np.cross((self.omega), np.cross(self.omega, (self.length * (self.position/(np.linalg.norm(self.position))))))
+#        self.acceleration = np.cross((self.alpha), (self.length * (self.position/(np.linalg.norm(self.position))))) + np.cross((self.omega), np.cross(self.omega, (self.length * (self.position/(np.linalg.norm(self.position))))))
 
-        self.velocity +=  self.acceleration*deltaT
+#        self.velocity +=  self.acceleration*deltaT
 
-        self.position += self.velocity*deltaT
+#        self.position += self.velocity*deltaT
 
     def GPE(self):
         return  self.mass * 9.81 * (self.position[1]+self.length)

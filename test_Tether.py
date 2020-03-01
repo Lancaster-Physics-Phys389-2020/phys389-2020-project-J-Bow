@@ -13,7 +13,7 @@ from Tether import Tether
 def test_set_theta(test_input, expected):
     assert Tether.set_theta(test_input) == expected
 
-
+@pytest.mark.parametrize("test_input, expected", [])
 
 
 pytest.main()
