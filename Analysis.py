@@ -8,15 +8,19 @@ import pandas as pd
 from pandas import DataFrame
 
 
-df = pd.read_pickle("output_data_1.csv")
 
 
-print(df['position'])
+df = pd.read_pickle("output_data_Euler.csv")
+plt.plot(df['time'], df['KE'], 'lightcoral' , label = "KE_E")
+plt.plot(df['time'], df['GPE'], 'indianred', label = "GPE_E")
+plt.plot(df['time'], df['total'], 'brown',label = "total_E")
 
-#x = [((df['position'][i][0])**2 + (df['position'][i][1])**2)**0.5 for i in range(len(df['position']))]
+plt.legend()
+plt.show()
 
-plt.plot([df['position'][i][0] for i in range(len(df['position']))],[df['position'][i][1] for i in range(len(df['position']))], 'red')
-#plt.plot([df_EC['position'][i][0] for i in range(len(df_EC['position']))],[df_EC['position'][i][1] for i in range(len(df_EC['position']))], 'blue')
+plt.plot([df['position'][i][0] for i in range(len(df['position']))],[df['position'][i][1] for i in range(len(df['position']))], 'purple', label = "Euler-Cromer")
+
+plt.legend()
 plt.show()
 
 plt.plot(df['time'], df['KE'], label = "KE")

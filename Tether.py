@@ -8,8 +8,8 @@ class Tether(Particle):
     """
     """
   
-    def __init__(self, Position=np.array([0,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), Acceleration=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float)):
-        super().__init__(Position=Position, Velocity=Velocity, Acceleration=Acceleration, name=name, mass=mass)
+    def __init__(self, Position=np.array([1,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float)):
+        super().__init__(Position=Position, Velocity=Velocity, name=name, mass=mass)
         self.theta = self.set_theta()
         self.length = self.set_length()
         self.omega = self.set_omega()
@@ -17,11 +17,12 @@ class Tether(Particle):
 
 
     def __repr__(self):
-        return '{0}, {1}, {2}, {3},  {4}, {5},  {6}, {7}, {8}'.format(self.name,self.mass,self.position, self.velocity,self.acceleration,self.theta,self.length, self.omega, self.alpha)
+        return '{0}, {1}, {2}, {3},  {4}, {5},  {6}, {7}'.format(self.name,self.mass,self.position, self.velocity,self.theta,self.length, self.omega, self.alpha)
 
     g=9.81
     
     def set_theta(self):
+        
         if self.position[0] ==0:
             if self.position[1] < 0:
                 return 0
@@ -33,59 +34,66 @@ class Tether(Particle):
             else:
                 return scipy.constants.pi/2
         else:
-            return np.arctan(self.position[1]/self.position[0]) - scipy.constants.pi/2 
+            return np.arctan2(self.position[1],self.position[0]) - scipy.constants.pi/2 
 
     def set_length(self):
         return np.linalg.norm(self.position)
 
     def set_omega(self):
-        return (np.cross(self.position, self.velocity)/(self.length**2))
+        if self.length == 0:
+            return [0, 0, 0]
+        else:
+            return (np.cross(self.position, self.velocity)/(self.length**2))
 
-    def update_angular(self, deltaT, method):
+    
 
-        def update_alpha(self, deltaT):
+    def update_alpha(self, deltaT):
+        if self.length == 0:
+            return [0,0,0]
+        else:
             self.alpha = np.array([0,0,-(9.81/self.length) * np.sin(self.theta)])
             return self.alpha
 
-        def update_omega(self, deltaT):
-            self.omega += self.alpha * deltaT
+    def update_omega(self, deltaT):
+        self.omega += self.alpha * deltaT
+        return self.omega
 
-        def update_theta(self, deltaT):
-#            if self.theta <= 2*scipy.constants.pi:
-            self.theta += self.omega[2] * deltaT
-#            else:
- #               self.theta =self.theta - 2*scipy.constants.pi
-  #              self.theta += self.omega[2] * deltaT 
+    def update_theta(self, deltaT):
+        self.theta += self.omega[2] * deltaT
+        return self.theta
 
+    def update_richardson(self, deltaT):
+        alpha_mid = np.array([0,0,(-(9.81/self.length)*np.sin(self.theta + (self.omega[2]*deltaT/2)))])
+        self.omega += alpha_mid*deltaT
+        self.theta += (self.omega[2] +0.5*self.alpha[2]*deltaT)*deltaT
+        self.alpha = alpha_mid
+        return self.theta, self.omega, self.alpha
+    
+    def update_angular(self, deltaT, method):
         if method == "Euler":
-            update_alpha(self, deltaT)
-            update_theta(self, deltaT)
-            update_omega(self, deltaT)
+            self.update_alpha(deltaT)
+            self.update_theta(deltaT)
+            self.update_omega(deltaT)
 
         elif method == "Euler-Cromer":
-            update_alpha(self, deltaT)
-            update_omega(self, deltaT)
-            update_theta(self, deltaT)
+            self.update_alpha(deltaT)
+            self.update_omega(deltaT)
+            self.update_theta(deltaT)
 
         elif method == "Euler-Richardson":
-            w_mid = self.omega + self.acceleration*deltaT/2.
+            self.update_alpha(deltaT)
+            self.update_richardson(deltaT) 
 
-            update_alpha(self, deltaT)
-            #self.omega += a_mid * deltaT
-            self.theta += w_mid * deltaT   
+        return self    
 
-    def update_linear(self, deltaT):
-#        self.position[0] = self.length * np.cos(self.theta - scipy.constants.pi/2)
-#        self.position[1] = self.length * np.sin(self.theta - scipy.constants.pi/2)
-        #A = a x r + w x r
-        self.acceleration = np.cross((self.alpha), (self.length * (self.position/(np.linalg.norm(self.position))))) + np.cross((self.omega), np.cross(self.omega, (self.length * (self.position/(np.linalg.norm(self.position))))))
+    def update_position(self):
+        self.position[0] = self.length * np.cos(self.theta - scipy.constants.pi/2)
+        self.position[1] = self.length * np.sin(self.theta - scipy.constants.pi/2)
+        return self.position
 
-        self.velocity +=  self.acceleration*deltaT
+    def update_velocity(self):
+        self.velocity = np.cross(self.omega, self.position)
+        return self.velocity
 
-        self.position += self.velocity*deltaT
-
-    def GPE(self):
-        return  self.mass * 9.81 * (self.position[1]+self.length)
-
-    def KE(self):
-        return 0.5 *self.mass * np.vdot(self.velocity, self.velocity)
+    def KE_angular(self):
+        return 0.5 * self.mass * (self.length**2) *np.vdot(self.omega, self.omega)
