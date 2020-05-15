@@ -1,5 +1,6 @@
 from Particle import Particle
 import numpy as np
+from unittest.mock import patch
 import math
 import copy
 import scipy.constants
@@ -34,7 +35,7 @@ class Tether(Particle):
             else:
                 return scipy.constants.pi/2
         else:
-            return np.arctan2(self.position[1],self.position[0]) - scipy.constants.pi/2 
+            return np.arctan2(self.position[1],self.position[0]) + scipy.constants.pi/2 
 
     def set_length(self):
         return np.linalg.norm(self.position)
@@ -44,8 +45,6 @@ class Tether(Particle):
             return [0, 0, 0]
         else:
             return (np.cross(self.position, self.velocity)/(self.length**2))
-
-    
 
     def update_alpha(self, deltaT):
         if self.length == 0:
@@ -63,11 +62,37 @@ class Tether(Particle):
         return self.theta
 
     def update_richardson(self, deltaT):
+        omega_mid = self.omega +0.5*self.alpha*deltaT
+        theta_mid = self.theta +0.5*self.omega[2]*deltaT
+        alpha_mid = np.array([0,0,-(9.81/self.length)*np.sin(theta_mid)])
+        self.omega = self.omega + alpha_mid * deltaT
+        self.theta = self.theta + omega_mid[2] *deltaT
+        """
+        # old method?
         alpha_mid = np.array([0,0,(-(9.81/self.length)*np.sin(self.theta + (self.omega[2]*deltaT/2)))])
         self.omega += alpha_mid*deltaT
         self.theta += (self.omega[2] +0.5*self.alpha[2]*deltaT)*deltaT
         self.alpha = alpha_mid
-        return self.theta, self.omega, self.alpha
+        """
+        return self.theta, self.omega
+
+    def RK_alpha(self,deltaT,theta, omega):
+        return (-(9.81/self.length) * math.sin(theta))
+
+    def update_RK(self, deltaT):
+        k1a, k1b, k2a, k2b, k3a, k3b, k4a, k4b = 0,0,0,0,0,0,0,0
+        k1a = deltaT * self.omega[2]
+        k1b = deltaT * self.RK_alpha(deltaT,self.theta,self.omega[2])
+        k2a = deltaT * (self.omega[2]+(k1b/2))
+        k2b = deltaT * self.RK_alpha(deltaT, (self.theta +(k1a/2)), (self.omega[2] + (k1b/2)))
+        k3a = deltaT * (self.omega[2]+(k2b/2))
+        k3b = deltaT * self.RK_alpha(deltaT, (self.theta +(k2a/2)), (self.omega[2] + (k2b/2)))
+        k4a = deltaT * (self.omega[2] + (k3b))
+        k4b = deltaT * self.RK_alpha(deltaT, (self.theta +(k3a)), (self.omega[2] + (k3b)))
+        theta_new = self.theta + ((k1a + 2*k2a + 2*k3a + k4a)/6)
+        omega_new =np.array([0,0, self.omega[2] + ((k1b + 2*k2b + 2*k3b + k4b)/6)])
+
+        return theta_new, omega_new
     
     def update_angular(self, deltaT, method):
         if method == "Euler":
@@ -83,7 +108,10 @@ class Tether(Particle):
         elif method == "Euler-Richardson":
             self.update_alpha(deltaT)
             self.update_richardson(deltaT) 
-
+        
+        elif method == "RK":
+            self.theta, self.omega = self.update_RK(deltaT)
+            
         return self    
 
     def update_position(self):
