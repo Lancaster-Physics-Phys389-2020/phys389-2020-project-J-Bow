@@ -59,7 +59,7 @@ class Tether(Particle):
 
     def update_theta(self, deltaT):
         self.theta += self.omega[2] * deltaT
-        return self.theta
+        return self.theta   
 
     def update_richardson(self, deltaT):
         omega_mid = self.omega +0.5*self.alpha*deltaT
@@ -84,9 +84,9 @@ class Tether(Particle):
         k1a = deltaT * self.omega[2]
         k1b = deltaT * self.RK_alpha(deltaT,self.theta,self.omega[2])
         k2a = deltaT * (self.omega[2]+(k1b/2))
-        k2b = deltaT * self.RK_alpha(deltaT, (self.theta +(k1a/2)), (self.omega[2] + (k1b/2)))
+        k2b = deltaT * self.RK_alpha(deltaT/2, (self.theta +(k1a/2)), (self.omega[2] + (k1b/2)))
         k3a = deltaT * (self.omega[2]+(k2b/2))
-        k3b = deltaT * self.RK_alpha(deltaT, (self.theta +(k2a/2)), (self.omega[2] + (k2b/2)))
+        k3b = deltaT * self.RK_alpha(deltaT/2, (self.theta +(k2a/2)), (self.omega[2] + (k2b/2)))
         k4a = deltaT * (self.omega[2] + (k3b))
         k4b = deltaT * self.RK_alpha(deltaT, (self.theta +(k3a)), (self.omega[2] + (k3b)))
         theta_new = self.theta + ((k1a + 2*k2a + 2*k3a + k4a)/6)
@@ -99,7 +99,7 @@ class Tether(Particle):
             self.update_alpha(deltaT)
             self.update_theta(deltaT)
             self.update_omega(deltaT)
-
+ 
         elif method == "Euler-Cromer":
             self.update_alpha(deltaT)
             self.update_omega(deltaT)
