@@ -41,6 +41,55 @@ class Tether(Particle):
     def set_omega(self):
         return (np.cross(self.position, self.velocity)/(self.length**2))
 
+    def update_alpha(self, deltaT):
+        if self.length == 0:
+            return [0,0,0]
+        else:
+            
+            self.alpha = np.array([0,0,-(self.gravity()/self.length) * np.sin(self.theta) + (self.density()*10*0.5*(7725-np.cos(self.theta)*self.omega[2]*self.length)**2 )/2]) #sphere
+            return self.alpha
+
+    def update_omega(self, deltaT):
+        self.omega += self.alpha * deltaT
+        return self.omega
+
+    def update_theta(self, deltaT):
+        self.theta += self.omega[2] * deltaT
+        return self.theta   
+
+    def update_richardson(self, deltaT):
+        omega_mid = self.omega +0.5*self.alpha*deltaT
+        theta_mid = self.theta +0.5*self.omega[2]*deltaT
+        alpha_mid = np.array([0,0,-(9.81/self.length)*np.sin(theta_mid)])
+        self.omega = self.omega + alpha_mid * deltaT
+        self.theta = self.theta + omega_mid[2] *deltaT
+        """
+        # old method?
+        alpha_mid = np.array([0,0,(-(9.81/self.length)*np.sin(self.theta + (self.omega[2]*deltaT/2)))])
+        self.omega += alpha_mid*deltaT
+        self.theta += (self.omega[2] +0.5*self.alpha[2]*deltaT)*deltaT
+        self.alpha = alpha_mid
+        """
+        return self.theta, self.omega
+
+    def RK_alpha(self,deltaT,theta, omega):
+        return (-(self.gravity()/self.length) * np.sin(self.theta)+ (self.density()*10*0.5*(7725-np.cos(self.theta)*self.omega*self.length)**2 )/2)
+
+    def update_RK(self, deltaT):
+        k1a, k1b, k2a, k2b, k3a, k3b, k4a, k4b = 0,0,0,0,0,0,0,0
+        k1a = deltaT * self.omega[2]
+        k1b = deltaT * self.RK_alpha(deltaT,self.theta,self.omega[2])
+        k2a = deltaT * (self.omega[2]+(k1b/2))
+        k2b = deltaT * self.RK_alpha(deltaT/2, (self.theta +(k1a/2)), (self.omega[2] + (k1b/2)))
+        k3a = deltaT * (self.omega[2]+(k2b/2))
+        k3b = deltaT * self.RK_alpha(deltaT/2, (self.theta +(k2a/2)), (self.omega[2] + (k2b/2)))
+        k4a = deltaT * (self.omega[2] + (k3b))
+        k4b = deltaT * self.RK_alpha(deltaT, (self.theta +(k3a)), (self.omega[2] + (k3b)))
+        theta_new = self.theta + ((k1a + 2*k2a + 2*k3a + k4a)/6)
+        omega_new =np.array([0,0, self.omega[2] + ((k1b + 2*k2b + 2*k3b + k4b)/6)])
+
+        return theta_new, omega_new
+    
     def update_angular(self, deltaT, method):
 
         def update_alpha(self, deltaT):
@@ -85,5 +134,11 @@ class Tether(Particle):
     def GPE(self):
         return  self.mass * 9.81 * (self.position[1]+self.length)
 
-    def KE(self):
-        return 0.5 *self.mass * np.vdot(self.velocity, self.velocity)
+    def KE_angular(self):
+        return 0.5 * self.mass * (self.length**2) *np.vdot(self.omega, self.omega)
+
+    def density(self):
+        return 10**(-1.02634886e-05 * (300E3 - self.length* np.cos(self.theta)) + -1.05177549e-02)
+
+    def gravity(self):
+        return(6.67E-11 * 5.972E24 * self.mass)/(300E3 - self.length* np.cos(self.theta))**2

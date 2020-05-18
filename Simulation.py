@@ -15,7 +15,7 @@ Data = []
 i = 10
 
 
-head = Tether(np.array([5,0,0]),np.array([0,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
+head = Tether(np.array([5,0,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 100E3, 0., 0. )
 
 
 while T <= endT:
