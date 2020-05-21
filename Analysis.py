@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 from pandas import DataFrame
 
-df = pd.read_pickle("data_ER.csv")
+df = pd.read_pickle("data_ER_0.01.csv")
 
 
 plt.figure("amplitude")
@@ -19,10 +19,8 @@ plt.plot(df['time'], -(df['GPE'][0]-df['GPE']), 'green', label = "GPE_E")
 plt.plot(df['time'], -(df['total'][0]-df['total']), 'palegreen',label = "total_E")
 plt.legend()
 
-
-plt.figure("alpha")
-plt.plot(df['time'], [df['alpha'][i][2] for i in range(len(df['position']))])
 plt.show()
+
 
 """
 df_RK01 = pd.read_pickle("data_RK_0.01.csv")
@@ -66,12 +64,12 @@ plt.show()
 #plt.plot([df_RK['position'][i][0] for i in range(len(df_RK['position']))],[df_RK['position'][i][1] for i in range(len(df_RK['position']))], 'palegreen', label = "Runge Kutta")
 
 #plt.legend()
-"""
 
-df_E = pd.read_pickle("data_E_0.001.csv")
-df_EC = pd.read_pickle("data_EC_0.001.csv")
-df_ER = pd.read_pickle("data_ER_0.001.csv")
-df_RK = pd.read_pickle("data_RK_0.001.csv")
+
+df_E = pd.read_pickle("data_E_100_0.001.csv")
+df_EC = pd.read_pickle("data_EC_100_0.001.csv")
+df_ER = pd.read_pickle("data_ER_100_0.001.csv")
+df_RK = pd.read_pickle("data_RK_100_0.001.csv")
 
 plt.figure("energy_all")
 plt.plot(df_E['time'], (df_E['total']- df_RK['total'][0])/df_RK['total'][0],'purple', label = "Euler")
@@ -105,7 +103,7 @@ plt.legend()
 
 plt.show()
 
-"""
+
 """
 
 plt.figure()

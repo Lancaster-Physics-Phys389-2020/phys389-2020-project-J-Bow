@@ -10,12 +10,16 @@ class Tether(Particle):
     lengths in Km
     """
   
-    def __init__(self, Position=np.array([1,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float)):
+    def __init__(self, Position=np.array([1,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float), C_d = 0.0, A=0.0, h=0.0, v=0.0):
         super().__init__(Position=Position, Velocity=Velocity, name=name, mass=mass)
         self.theta = self.set_theta()
         self.length = self.set_length()
         self.omega = self.set_omega()
         self.alpha = alpha
+        self.C_d = C_d
+        self.A = A
+        self.h = h
+        self.v = v
 
 
     def __repr__(self):
@@ -66,17 +70,17 @@ class Tether(Particle):
         if self.length == 0: #prevents a divide by zero error
             return [0,0,0] 
         else:
-            self.alpha = np.array([0,0,(-(6.67E-23 * 5.97E24/ ((300 + 6371)- self.length*np.cos(self.theta))**2) * np.sin(self.theta) + self.Drag(self.theta, self.omega[2]))/self.length])
+            self.alpha = np.array([0,0,self.temp_alpha(deltaT, self.theta, self.omega[2])]) 
             return self.alpha
 
     def temp_alpha(self,deltaT,theta, omega):
         """
         returns a new temporary angular acceleration vector for the Runge-Kutta method. It uses the given theta and omega values instead of the values from self
         """
-        return (-(6.67E-23 * 5.97E24/((300 + 6371) - self.length*np.cos(self.theta))**2) * np.sin(self.theta)  +self.Drag(theta, omega))/self.length
+        return (-(6.67E-23 * 5.97E24/((self.h + 6371) - self.length*np.cos(theta))**2) * np.sin(theta)  +self.Drag(theta, omega))/self.length
 
     def Drag(self, theta, omega):
-        return 2 * 10 * (10**(-0.01026349 *(300 - (self.length*np.cos(theta)))-7.51775493  )) * (((7725*np.cos(theta)/self.length) -omega)**2) /(2*self.mass)
+        return self.C_d * self.A * (10**(-0.01026349 *(self.h - (self.length*np.cos(theta)))-7.51775493  )) * (((self.v*np.cos(theta)/self.length) -omega)**2) /(2*self.mass)
 
 
     def update_omega(self, deltaT):
@@ -99,7 +103,7 @@ class Tether(Particle):
         """
         omega_mid = self.omega +0.5*self.alpha*deltaT
         theta_mid = self.theta +0.5*self.omega[2]*deltaT
-        alpha_mid = np.array([0,0,self.temp_alpha(deltaT, theta_mid, omega_mid)])
+        alpha_mid = np.array([0,0,self.temp_alpha(deltaT, theta_mid, omega_mid[2])])
         self.omega = self.omega + alpha_mid * deltaT
         self.theta = self.theta + omega_mid[2] *deltaT
 
@@ -174,4 +178,4 @@ class Tether(Particle):
         """
         find the gravitational potential energy
         """
-        return  self.mass * -(6.67E-23 * 5.97E24)/((300 + 6371 - self.length*np.cos(self.theta)) )
+        return  self.mass * -(6.67E-23 * 5.97E24)/((self.h + 6371 - self.length*np.cos(self.theta)) )

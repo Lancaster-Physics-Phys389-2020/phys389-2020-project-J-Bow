@@ -19,8 +19,9 @@
   "test_Tether.py::test_update_theta[test_input0-0]",
   "test_Tether.py::test_update_theta[test_input1-1.5707963267948966]",
   "test_Tether.py::test_update_richardson[test_input0-expected0]",
-  "test_Tether.py::test_RK_alpha[test_input0-0]",
-  "test_Tether.py::test_RK_alpha[test_input1--9.81]",
+  "test_Tether.py::test_temp_alpha[test_input0--1.962070477e-06]",
+  "test_Tether.py::test_temp_alpha[test_input1-0]",
+  "test_Tether.py::test_temp_alpha[test_input2--9.81e-06]",
   "test_Tether.py::test_update_RK[test_input0-expected0]",
   "test_Tether.py::test_update_RK[test_input1-expected1]",
   "test_Tether.py::test_update_position[test_input0-expected0]",
@@ -31,7 +32,12 @@
   "test_Tether.py::test_update_velocity[test_input0-expected0]",
   "test_Tether.py::test_update_velocity[test_input1-expected1]",
   "test_Tether.py::test_update_velocity[test_input2-expected2]",
-  "test_Tether.py::test_KE_angular[test_input0-expected0]",
-  "test_Tether.py::test_KE_angular[test_input1-expected1]",
-  "test_Tether.py::test_KE_angular[test_input2-expected2]"
+  "test_Tether.py::test_KE_angular[test_input0-0.5]",
+  "test_Tether.py::test_KE_angular[test_input1-0]",
+  "test_Tether.py::test_KE_angular[test_input2-18.0]",
+  "test_Tether.py::test_GPE_ang[test_input0--0.062511]",
+  "test_Tether.py::test_GPE_ang[test_input1--0.125022]",
+  "test_Tether.py::test_GPE_ang[test_input2--0.0625018]",
+  "test_Tether.py::test_GPE_ang[test_input3--0.0597]",
+  "test_Tether.py::test_Drag[test_input0--1.0252222e-11]"
 ]

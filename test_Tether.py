@@ -35,17 +35,18 @@ def test_update_omega(test_input, expected):
 def test_update_theta(test_input, expected):
     assert Tether.update_theta(test_input, 0.1) == expected
 
-@pytest.mark.parametrize("test_input, expected", [(Tether(Position = [4,0,0], alpha = np.array([0,0,(-9.81/4)])), [1.5585338, [0,0,-0.24524539]])])
+@pytest.mark.parametrize("test_input, expected", [([Tether(Position = [4,0,0]), 0.1], [1.570796, [0,0,-0.2452900E-6]])])
 def test_update_richardson(test_input, expected):
-    theta, omega = Tether.update_richardson(test_input, 0.1)
+    deltaT = test_input[1]
+    theta, omega = Tether.update_richardson(test_input[0], deltaT)
     assert np.allclose(theta, expected[0], rtol = 1E-5)
-    assert np.allclose(omega, expected[1], rtol = 1E-3)
+    assert np.allclose(omega, expected[1], rtol = 1E-5)
 
-@pytest.mark.parametrize("test_input, expected", [(Tether(Position = [0,-1,0]), 0 ), (Tether(Position = [1,0,0]), -9.81)])
-def test_RK_alpha(test_input, expected):
-    theta = test_input.theta
-    alpha = test_input.alpha
-    assert Tether.RK_alpha(test_input, 0.1, theta, alpha) == expected
+@pytest.mark.parametrize("test_input, expected", [(([Tether(Position = [5,0,0], C_d=0.), np.pi/2, 0]), -1.962070477E-6), ([Tether(Position = [0,-4,0], C_d=0.), 0, 0], 0), ([Tether(Position = [1,0,0], C_d=0.), np.pi/2, 0], -9.81E-6)])
+def test_temp_alpha(test_input, expected):
+    theta = test_input[1]
+    omega = test_input[2]
+    assert np.allclose(Tether.temp_alpha(test_input[0], 0.1, theta, omega), expected, rtol =5)
 
 @pytest.mark.parametrize("test_input, expected", [(Tether(Position = [0,-1,0]), [0,[0,0,0]] ), (Tether(Position = [1,0,0]), [scipy.constants.pi/2, [0,0,-0.981] ])])
 def test_update_RK(test_input, expected):
@@ -61,14 +62,20 @@ def test_update_position(test_input, expected):
 def test_update_velocity(test_input, expected):
     assert np.allclose(Tether.update_velocity(test_input), expected, rtol = 1E-5)
 
-
-
-@pytest.mark.parametrize("test_input, expected", [(Tether(Position = [0,-1,0], Velocity = [1,0,0]),[1,0,0] ), (Tether(Position = [1,0,0], Velocity = [1,0,0]), [0,0,0]), (Tether(Position = [0,-1,0], Velocity = [6,8,0]),[6,0,0] )])
+@pytest.mark.parametrize("test_input, expected", [(Tether(Position = [0,-1,0], Velocity = [1,0,0]),0.5 ), (Tether(Position = [1,0,0], Velocity = [1,0,0]), 0), (Tether(Position = [0,-1,0], Velocity = [6,8,0]), 18. )])
 def test_KE_angular(test_input, expected):
     assert np.allclose(Tether.KE_angular(test_input), expected, rtol = 1E-5)
 
+@pytest.mark.parametrize("test_input, expected", [(Tether(Position = [0,-1,0]), - 0.062511),(Tether(Position = [0,-1,0], mass = 2.), - 2*0.062511), (Tether(Position = [1,0,0]), -0.06250180), (Tether(Position = [0,-1,0], h = 300), -0.0597 )])
+def test_GPE_ang(test_input, expected):
+    assert np.allclose(Tether.GPE_ang(test_input), expected, rtol = 1E-5)
 
-#zero error if set at [0,1,0]
+
+@pytest.mark.parametrize("test_input, expected", [(([Tether(Position = [5,0,0], C_d=2. , A=1., h=300, v=7), 0, 2 ]), -1.0252222E-11)])
+def test_Drag(test_input, expected):
+    theta = test_input[1]
+    omega = test_input[2]
+    assert np.allclose(Tether.Drag(test_input[0], theta, omega), expected, rtol =5)
 
 #np.allclose
 
