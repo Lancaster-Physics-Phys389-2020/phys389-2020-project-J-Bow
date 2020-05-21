@@ -7,6 +7,7 @@ import scipy.constants
 
 class Tether(Particle):
     """
+    lengths in Km
     """
   
     def __init__(self, Position=np.array([1,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float), name='Ball', mass=1.0, Theta=0.0, Length = 0., omega=np.array([0,0,0], dtype=float), alpha=np.array([0,0,0], dtype=float)):
@@ -65,14 +66,18 @@ class Tether(Particle):
         if self.length == 0: #prevents a divide by zero error
             return [0,0,0] 
         else:
-            self.alpha = np.array([0,0,-(9.81/self.length) * np.sin(self.theta)])
+            self.alpha = np.array([0,0,(-(6.67E-23 * 5.97E24/ ((300 + 6371)- self.length*np.cos(self.theta))**2) * np.sin(self.theta) + self.Drag(self.theta, self.omega[2]))/self.length])
             return self.alpha
 
     def temp_alpha(self,deltaT,theta, omega):
         """
         returns a new temporary angular acceleration vector for the Runge-Kutta method. It uses the given theta and omega values instead of the values from self
         """
-        return -(9.81/self.length) * np.sin(theta)      
+        return (-(6.67E-23 * 5.97E24/((300 + 6371) - self.length*np.cos(self.theta))**2) * np.sin(self.theta)  +self.Drag(theta, omega))/self.length
+
+    def Drag(self, theta, omega):
+        return 1 * 1 * (10**(-0.01026349 *(300 - (self.length*np.cos(theta)))-7.51775493  )) * (((7725*np.cos(theta)/self.length) -omega)**2) /(2*self.mass)
+
 
     def update_omega(self, deltaT):
         """
@@ -97,8 +102,9 @@ class Tether(Particle):
         alpha_mid = np.array([0,0,self.temp_alpha(deltaT, theta_mid, omega_mid)])
         self.omega = self.omega + alpha_mid * deltaT
         self.theta = self.theta + omega_mid[2] *deltaT
-        return self.theta, self.omega
 
+        return self.theta, self.omega
+ 
 
     def update_RK(self, deltaT):
         """
@@ -138,6 +144,7 @@ class Tether(Particle):
         
         elif method == "RK": #Runge-Kutta method 
             self.theta, self.omega = self.update_RK(deltaT)
+            self.alpha = self.update_alpha(deltaT)
             
         return self    
 
@@ -160,4 +167,11 @@ class Tether(Particle):
         """
         Calculates the kinetic energy from the angular velocity
         """
-        return 0.5 * self.mass * (self.length**2) *np.vdot(self.omega, self.omega)
+        return 0.5 * self.mass * ((self.length)**2) *np.vdot(self.omega, self.omega)
+
+
+    def GPE_ang(self):
+        """
+        find the gravitational potential energy
+        """
+        return  self.mass * -(6.67E-23 * 5.97E24)/((300 + 6371 - self.length*np.cos(self.theta)) )
