@@ -17,3 +17,4 @@ set:
 endT to the length you would like the simulation to for in seconds. 
 deltaT to the length of the desired time step in seconds. 
 Numer to the number of data points you would like. 
+
