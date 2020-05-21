@@ -1,0 +1,13 @@
+
+Advanced computing techniques used:
+- Classes
+- Inheritance
+- Pandas
+
+Python packages used:
+- numpy
+- math
+- copy
+- scipy
+- Pandas
+- matplotlib.pyplot

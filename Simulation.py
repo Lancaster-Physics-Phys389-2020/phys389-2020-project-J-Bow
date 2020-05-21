@@ -11,14 +11,14 @@ import time
 start_time = time.time()
 
 
-deltaT = 0.01  #time step in seconds  
-endT = 100  #length of simulation in seconds
+deltaT = 0.1  #time step in seconds  
+endT = 500  #length of simulation in seconds
 Number = 1000   # number of data points you want
-initial_position = np.array([-0.002,-0.002,0])  #position vector [x, y, z] in km
+initial_position = np.array([-2,-2,0])  #position vector [x, y, z] in km
 initial_velocity = np.array([0,0,0])    #velocity vector [x, y, z] in kms^-1
 mass = 1.0  #mass in kg
-method = "ER" # E = Euler, EC = Euler-Cromer, ER = Euler-Richard, RK = Runge-Kutta
-dataName = "data_ER_0.01.csv" # must end in .csv
+method = "RK" # E = Euler, EC = Euler-Cromer, ER = Euler-Richard, RK = Runge-Kutta
+dataName = "data_RK.csv" # must end in .csv
 C_d = 0. #coefficient of drag of head (float)
 A = 0.   #surface area of head in km^2
 h = 0. #altitude in km
