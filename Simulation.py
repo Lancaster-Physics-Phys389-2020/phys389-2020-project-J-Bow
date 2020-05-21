@@ -11,23 +11,33 @@ import time
 start_time = time.time()
 
 
-deltaT = 0.001
+deltaT = 0.00001  #time step in seconds  
+endT = 100  #length of simulation in seconds
+Number = 1000   # number of data points you want
+initial_position = np.array([-2,-2,0])  #position vector [x, y, z] in km
+initial_velocity = np.array([0,0,0])    #velocity vector [x, y, z] in kms^-1
+mass = 1.0  #mass in kg
+method = "EC"
+dataName = "data_EC_100_0.00001.csv" # must end in .csv
+C_d = 2 #coefficient of drag of head
+A = 1   #surface area of head in km^2
+h = 300 #altitude in km
+v = 7.725   #orbital velocity in kms^-1
+
+
 T = 0
-endT = 1000
-Number = 1000 # number of data points you want
 Data = []
-i = 10
+i = 0
 TotalIterations = endT/ deltaT
 Number_i = TotalIterations/Number
-
+head = Tether(initial_position,initial_velocity,'head', mass, scipy.constants.pi/2, 1., 0., 0. )
 T_array = []
 
-head = Tether(np.array([1000,-500,0]),np.array([0,0,0]),'head', 1, scipy.constants.pi/2, 1., 0., 0. )
 
 
 while T <= endT:
     T += deltaT
-    head.update_angular(deltaT, "ER")
+    head.update_angular(deltaT, method)
     head.update_position()
     head.update_velocity()
     temp_head =copy.deepcopy(head)
@@ -41,7 +51,7 @@ while T <= endT:
 
 
 df = pd.DataFrame(data = Data, columns= ['KE', 'GPE', 'total', 'name', 'mass', 'position', 'theta', 'omega', 'alpha', 'time', 'velocity'])
-df.to_pickle("data_ER_0.001.csv")
+df.to_pickle(dataName)
 
 print(df)
 print("--- %s seconds ---" % (time.time() - start_time))
