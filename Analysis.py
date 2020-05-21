@@ -6,7 +6,7 @@ import scipy.constants
 import matplotlib.pyplot as plt
 import pandas as pd 
 from pandas import DataFrame
-"""
+
 df = pd.read_pickle("data_ER.csv")
 
 
@@ -14,16 +14,16 @@ plt.figure("amplitude")
 plt.plot(df['time'], [df['position'][i][0] for i in range(len(df['position']))])
 
 plt.figure('energy')
-plt.plot(df['time'], df['KE'][0]-df['KE'], 'yellow' , label = "KE_E")
-plt.plot(df['time'], df['GPE'][0]-df['GPE'], 'green', label = "GPE_E")
-plt.plot(df['time'], df['total'][0]-df['total'], 'palegreen',label = "total_E")
+plt.plot(df['time'], -(df['KE'][0]-df['KE']), 'yellow' , label = "KE_E")
+plt.plot(df['time'], -(df['GPE'][0]-df['GPE']), 'green', label = "GPE_E")
+plt.plot(df['time'], -(df['total'][0]-df['total']), 'palegreen',label = "total_E")
 plt.legend()
 
 
 plt.figure("alpha")
 plt.plot(df['time'], [df['alpha'][i][2] for i in range(len(df['position']))])
 plt.show()
-"""
+
 """
 df_RK01 = pd.read_pickle("data_RK_0.01.csv")
 df_RK001 = pd.read_pickle("data_RK_0.001.csv")
@@ -66,7 +66,7 @@ plt.show()
 #plt.plot([df_RK['position'][i][0] for i in range(len(df_RK['position']))],[df_RK['position'][i][1] for i in range(len(df_RK['position']))], 'palegreen', label = "Runge Kutta")
 
 #plt.legend()
-
+"""
 
 df_E = pd.read_pickle("data_E_0.001.csv")
 df_EC = pd.read_pickle("data_EC_0.001.csv")
@@ -105,6 +105,7 @@ plt.legend()
 
 plt.show()
 
+"""
 """
 
 plt.figure()

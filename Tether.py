@@ -76,7 +76,7 @@ class Tether(Particle):
         return (-(6.67E-23 * 5.97E24/((300 + 6371) - self.length*np.cos(self.theta))**2) * np.sin(self.theta)  +self.Drag(theta, omega))/self.length
 
     def Drag(self, theta, omega):
-        return 1 * 1 * (10**(-0.01026349 *(300 - (self.length*np.cos(theta)))-7.51775493  )) * (((7725*np.cos(theta)/self.length) -omega)**2) /(2*self.mass)
+        return 2 * 10 * (10**(-0.01026349 *(300 - (self.length*np.cos(theta)))-7.51775493  )) * (((7725*np.cos(theta)/self.length) -omega)**2) /(2*self.mass)
 
 
     def update_omega(self, deltaT):

@@ -11,7 +11,7 @@ import time
 start_time = time.time()
 
 
-deltaT = 0.001
+deltaT = 0.01
 T = 0
 endT = 1000
 Number = 1000 # number of data points you want
